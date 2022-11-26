@@ -89,8 +89,8 @@ class PostsUrlsTests(TestCase):
         Проверка на доступность ссылок гостевому пользователю.
         """
         url_names = [
-            self.create,
-            self.edit,
+            self.create_page,
+            self.edit_page,
         ]
 
         for url in url_names:
@@ -106,7 +106,7 @@ class PostsUrlsTests(TestCase):
         Проверка доступности редактирования поста.
         """
 
-        response = self.authorized_client.get(self.edit)
+        response = self.authorized_client.get(self.edit_page)
 
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
@@ -115,7 +115,7 @@ class PostsUrlsTests(TestCase):
         Проверка редиректа редактирования поста
         для неавтора.
         """
-        response = self.no_author_client.get(self.edit)
+        response = self.no_author_client.get(self.edit_page)
 
         self.assertRedirects(
             response,
@@ -127,10 +127,10 @@ class PostsUrlsTests(TestCase):
         Проверка редиректа редактирования поста
         для гостя.
         """
-        response = self.guest_client.get(self.edit)
+        response = self.guest_client.get(self.edit_page)
         self.assertRedirects(
             response,
-            reverse('users:login') + "?next=" + self.edit
+            reverse('users:login') + "?next=" + self.edit_page
         )
 
     def test_urls_use_correct_template(self):
