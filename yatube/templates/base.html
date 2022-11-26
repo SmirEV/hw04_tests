@@ -1,0 +1,22 @@
+{% load static %}
+<!DOCTYPE html> <!-- Используется html 5 версии -->
+<html lang="ru"> <!-- Язык сайта - русский -->
+{% block header %}
+{% endblock %}
+  <body>
+      {% include 'includes/header.html' %}      
+    <main> 
+      <!-- класс py-5 создает отступы сверху и снизу блока -->
+      <div class="container py-5">     
+        {%block content%}
+          Content will be here
+        {%endblock%}
+      </div>  
+    </main>
+    <!-- Использованы классы бустрапа: -->
+    <!-- border-top: создаёт тонкую линию сверху блока -->
+    <!-- text-center: выравнивает текстовые блоки внутри блока по центру -->
+    <!-- py-3: контент внутри размещается с отступом сверху и снизу -->         
+    {% include 'includes/footer.html' %}   
+  </body>
+</html>
