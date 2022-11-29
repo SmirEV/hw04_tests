@@ -1,9 +1,9 @@
-from django.contrib.auth import get_user_model
+# from django.contrib.auth import get_user_model
 from django.test import TestCase
 
-from ..models import Group, Post
+from ..models import Group, Post, User
 
-User = get_user_model()
+# User = get_user_model()
 
 
 class PostModelTest(TestCase):
@@ -23,17 +23,13 @@ class PostModelTest(TestCase):
 
     def test_models_have_correct_object_names(self):
         """Проверяем, что у моделей корректно работает __str__."""
-        act = PostModelTest.post.__str__()
         self.assertEqual(
-            act,
-            PostModelTest.post.text[:15],
-            'Метод __str__ у Post работает неправильно'
+            PostModelTest.post.__str__(),
+            PostModelTest.post.text[:15]
         )
 
-        group = PostModelTest.group  # Обратите внимание на синтаксис
-        expected_object_name = group.title
+        group = self.group
         self.assertEqual(
-            expected_object_name,
-            str(group),
-            'Метод __str__ у Group работает неправильно'
+            group.title,
+            str(group)
         )

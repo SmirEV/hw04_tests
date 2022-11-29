@@ -1,22 +1,18 @@
 {% load static %}
-<!DOCTYPE html> <!-- Используется html 5 версии -->
-<html lang="ru"> <!-- Язык сайта - русский -->
-{% block header %}
-{% endblock %}
-  <body>
-      {% include 'includes/header.html' %}      
+<!DOCTYPE html>
+<html lang="ru">
+  {% block title%}
+    <title> Name of page will be here </title>
+  {% endblock%} 
+  {% include 'includes/header.html' %}  
+  <body>    
     <main> 
-      <!-- класс py-5 создает отступы сверху и снизу блока -->
       <div class="container py-5">     
         {%block content%}
           Content will be here
         {%endblock%}
       </div>  
-    </main>
-    <!-- Использованы классы бустрапа: -->
-    <!-- border-top: создаёт тонкую линию сверху блока -->
-    <!-- text-center: выравнивает текстовые блоки внутри блока по центру -->
-    <!-- py-3: контент внутри размещается с отступом сверху и снизу -->         
+    </main>       
     {% include 'includes/footer.html' %}   
   </body>
 </html>

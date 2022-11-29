@@ -1,26 +1,17 @@
 {% extends 'base.html' %}
-{% block header %}
-<h1> {{ group.title }} </h1>
+{% block title %}
+<title>  {{ group.title }} </title>
 {% endblock %}
 {% block content %}
-<head>  
-  <title>  Записи сообщества {{ group.title }} </title>
-</head>
-  <body>
-    <main>
-      <div class="container">
-        <h1> Записи сообщества {{ group.title }} </h1>
-        <p>
-          {{ group.description }}
-        </p>
-          {% for post in page_obj %}
-            {% include 'includes/post.html' %}   
-            {% if not forloop.last %}
-              <hr>
-            {% endif %}
-          {% endfor %}
-          {% include 'includes/paginator.html' %}
-      </div>  
-    </main>
-  </body>
+  <h1>{{  group.title  }}</h1>
+  <p>
+    {{ group.description |linebreaksbr }}
+  </p>
+  {% for post in page_obj %}
+    {% include 'includes/post.html' %}   
+    {% if not forloop.last %}
+      <hr>
+    {% endif %}
+  {% endfor %}
+  {% include 'includes/paginator.html' %}
 {% endblock %}
