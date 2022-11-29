@@ -2,17 +2,8 @@ from django.test import Client, TestCase
 from django.urls import reverse
 
 from posts.models import Group, Post, User
-# from posts.utils import MAX_POSTS_COUNT, page_split
-from ..constants import *
 
-
-INDEX_TEMPLATE = 'posts/index.html'
-GROUP_LIST_TEMPLATE = 'posts/group_list.html'
-PROFILE_TEMPLATE = 'posts/profile.html'
-POST_DETAIL_TEMPLATE = 'posts/post_detail.html'
-
-CREATE_POST_TEMPLATE = 'posts/create_post.html'
-EDIT_POST_TEMPLATE = 'posts/create_post.html'  # ???
+from ..constants import MAX_POSTS_COUNT
 
 
 class PostsViewsTests(TestCase):

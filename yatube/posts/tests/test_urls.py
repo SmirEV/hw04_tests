@@ -6,7 +6,9 @@ from django.core.cache import cache
 
 from posts.models import Group, Post, User
 
-from ..constants import *
+from ..constants import (INDEX_TEMPLATE, GROUP_LIST_TEMPLATE,
+                         PROFILE_TEMPLATE, POST_DETAIL_TEMPLATE,
+                         CREATE_POST_TEMPLATE)
 
 
 class PostsUrlsTests(TestCase):

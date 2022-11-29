@@ -7,4 +7,3 @@ PROFILE_TEMPLATE = 'posts/profile.html'
 POST_DETAIL_TEMPLATE = 'posts/post_detail.html'
 
 CREATE_POST_TEMPLATE = 'posts/create_post.html'
-EDIT_POST_TEMPLATE = 'posts/create_post.html'  # ???
