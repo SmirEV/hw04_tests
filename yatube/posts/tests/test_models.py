@@ -3,8 +3,6 @@ from django.test import TestCase
 
 from ..models import Group, Post, User
 
-# User = get_user_model()
-
 
 class PostModelTest(TestCase):
     @classmethod
@@ -23,13 +21,8 @@ class PostModelTest(TestCase):
 
     def test_models_have_correct_object_names(self):
         """Проверяем, что у моделей корректно работает __str__."""
-        self.assertEqual(
-            PostModelTest.post.__str__(),
-            PostModelTest.post.text[:15]
-        )
+        post = self.post
+        self.assertEqual(post.text[:15], str(post))
 
         group = self.group
-        self.assertEqual(
-            group.title,
-            str(group)
-        )
+        self.assertEqual(group.title, str(group))

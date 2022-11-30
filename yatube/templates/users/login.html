@@ -9,6 +9,7 @@
           Войти на сайт
         </div>
         <div class="card-body">
+          {% load user_filters %}
           {% if form.errors %}
               {% for field in form %}
                 {% for error in field.errors %}            

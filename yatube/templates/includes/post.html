@@ -1,8 +1,9 @@
 <article>
   <ul>
     <li>
-      <a class="nav-link" href="{% url 'posts:profile' post.author %}">   <!--  ??? -->
-        Автор: {{ post.author.get_full_name }}
+      Автор: 
+      <a href="{% url 'posts:profile' post.author.username %}"> 
+        {{ post.author.get_full_name }}
       </a>
     </li>
     <li>

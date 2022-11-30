@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block title %}
-  <title> Пост {{ post.text|truncatechars:30 }} </title>
+  Пост {{ post.text|truncatechars:30 }}
 {% endblock %}
 {% block content %}
   <div class="row">
@@ -10,23 +10,21 @@
           Дата публикации: {{ post.pub_date }} 
         </li>
         <li class="list-group-item" >
-          <a class="nav-link" href="{% url 'posts:profile' post.author %}">
-            Автор: {{ post.author.get_full_name }}
-          </a>
+          Автор: <a href="{% url 'posts:profile' post.author.username %}"> {{ post.author.get_full_name }} </a>
         </li>
         <li class="list-group-item d-flex justify-content-between align-items-center">
           Всего постов автора:  <span > {{ post.author.posts.count }} </span>
         </li>
         {% if post.author == user%}
           <li class="list-group-item d-flex justify-content-between align-items-center">
-            <a class="nav-link" href="{% url 'posts:post_edit' post.pk %}">
+            <a href="{% url 'posts:post_edit' post.pk %}">
               Редактировать пост
             </a>
           </li>
         {% endif %}
         {% if post.group %}   
           <li class="list-group-item">
-            <a href="{% url 'posts:group_list' post.group.slug %}">все записи группы {{post.group}}</a> 
+            Группа: <a href="{% url 'posts:group_list' post.group.slug %}"> {{post.group}}</a> 
           </li>
         {% endif %}
       </ul>
