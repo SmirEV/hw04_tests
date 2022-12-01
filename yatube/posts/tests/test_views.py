@@ -78,13 +78,13 @@ class PostsViewsTests(TestCase):
     def test_groups_page_show_correct_context(self):
         """Шаблон group_list.html сформирован с правильным контекстом."""
         response = self.authorized_client.get(GROUP_LIST_URL)
-        self.assertEqual(response.context['group'], self.group)
-        self.assertEqual(response.context['group'].title, self.group.title)
-        self.assertEqual(response.context['group'].slug, self.group.slug)
+        response_context_group = response.context['group']
+        self.assertEqual(response_context_group, self.group)
+        self.assertEqual(response_context_group.title, self.group.title)
+        self.assertEqual(response_context_group.slug, self.group.slug)
         self.assertEqual(
-            response.context['group'].description,
-            self.group.description
-        )
+            response_context_group.description,
+            self.group.description)
         self.assertEqual(len(response.context['page_obj']), 1)
         self.posts_check_all_fields(response.context['page_obj'][0])
 
@@ -122,9 +122,7 @@ class PostsPaginatorViewsTests(TestCase):
         cls.group = Group.objects.create(
             title='Тестовая группа',
             slug=SLUG1,
-            description='Тестовое описание',
-        )
-
+            description='Тестовое описание')
         Post.objects.bulk_create(
             Post(
                 text=f'Текст {i}',
@@ -132,18 +130,16 @@ class PostsPaginatorViewsTests(TestCase):
                 group=cls.group
             ) for i in range(cls.PAGE_COUNT))
 
-        cls.cases = [
-            (INDEX_URL, MAX_POSTS_COUNT),
-            (INDEX_URL + '?page=2', cls.ADDITIONAL_POST_COUNT),
-            (GROUP_LIST_URL, MAX_POSTS_COUNT),
-            (GROUP_LIST_URL + '?page=2', cls.ADDITIONAL_POST_COUNT),
-            (PROFILE1_URL, MAX_POSTS_COUNT),
-            (PROFILE1_URL + '?page=2', cls.ADDITIONAL_POST_COUNT),
-        ]
-
     def test_count_records_at_pages(self):
         """Проверка, содержат ли страницы нужное количество записей"""
-        for url, posts_count in self.cases:
+        cases = [
+            (INDEX_URL, MAX_POSTS_COUNT),
+            (INDEX_URL + '?page=2', self.ADDITIONAL_POST_COUNT),
+            (GROUP_LIST_URL, MAX_POSTS_COUNT),
+            (GROUP_LIST_URL + '?page=2', self.ADDITIONAL_POST_COUNT),
+            (PROFILE1_URL, MAX_POSTS_COUNT),
+            (PROFILE1_URL + '?page=2', self.ADDITIONAL_POST_COUNT)]
+        for url, posts_count in cases:
             response = self.authorized_client.get(url)
             with self.subTest(url=url, posts_count=posts_count):
                 self.assertEqual(
