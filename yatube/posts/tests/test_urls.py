@@ -1,8 +1,8 @@
 from http import HTTPStatus
 
+from django.core.cache import cache
 from django.test import Client, TestCase
 from django.urls import reverse
-from django.core.cache import cache
 
 from posts.models import Group, Post, User
 
@@ -17,7 +17,7 @@ INDEX_URL = reverse('posts:index')
 GROUP_LIST_URL = reverse('posts:group_list', kwargs={'slug': SLUG})
 PROFILE_URL = reverse('posts:profile', kwargs={'username': USERNAME})
 CREATE_POST_URL = reverse('posts:post_create')
-CREATE_REDIR_URL = LOGIN_URL + '?next=' + CREATE_POST_URL
+CREATE_REDIR_URL = f'{LOGIN_URL}?next={CREATE_POST_URL}'
 
 
 class PostsUrlsTests(TestCase):
@@ -43,7 +43,7 @@ class PostsUrlsTests(TestCase):
             'posts:post_edit',
             kwargs={'post_id': cls.post.id},
         )
-        cls.EDIT_REDIR_URL = LOGIN_URL + '?next=' + cls.POST_EDIT_URL
+        cls.EDIT_REDIR_URL = f'{LOGIN_URL}?next={cls.POST_EDIT_URL}'
 
     def setUp(self):
         self.guest = Client()
@@ -58,19 +58,23 @@ class PostsUrlsTests(TestCase):
 
     def test_all_cases(self):
         """Проверка доступа страниц приложения post для разных юзеров."""
-        cases = [
-            (INDEX_URL, self.guest, HTTPStatus.OK),
-            (GROUP_LIST_URL, self.guest, HTTPStatus.OK),
-            (PROFILE_URL, self.guest, HTTPStatus.OK),
-            (self.POST_DETAIL_URL, self.guest, HTTPStatus.OK),
-            (CREATE_POST_URL, self.author, HTTPStatus.OK),
-            (self.POST_EDIT_URL, self.author, HTTPStatus.OK),
-            (CREATE_POST_URL, self.guest, HTTPStatus.FOUND),
-            (self.POST_EDIT_URL, self.guest, HTTPStatus.FOUND),
-            (self.POST_EDIT_URL, self.another, HTTPStatus.FOUND)]
-        for url, client, status in cases:
+        cases_OK = [
+            (INDEX_URL, self.guest),
+            (GROUP_LIST_URL, self.guest),
+            (PROFILE_URL, self.guest),
+            (self.POST_DETAIL_URL, self.guest),
+            (CREATE_POST_URL, self.author),
+            (self.POST_EDIT_URL, self.author)]
+        cases_FOUND = [
+            (CREATE_POST_URL, self.guest),
+            (self.POST_EDIT_URL, self.guest),
+            (self.POST_EDIT_URL, self.another)]
+        for url, client in cases_OK:
             with self.subTest(url=url, client=client):
-                self.assertEqual(client.get(url).status_code, status)
+                self.assertEqual(client.get(url).status_code, HTTPStatus.OK)
+        for url, client in cases_FOUND:
+            with self.subTest(url=url, client=client):
+                self.assertEqual(client.get(url).status_code, HTTPStatus.FOUND)
 
     def test_redirect_cases(self):
         """Проверка редиректа для неавториз и невавтора."""
