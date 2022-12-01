@@ -3,7 +3,6 @@
   {% if post %} Редактирование поста {% else %} Новый пост {% endif %}
 {% endblock %}
 {% block content %}
-  <h1> {% if post %} Редактирование поста {% else %} Новый пост {% endif %} </h1>
   {% if form.errors %}
     {% for field in form %}
       {% for error in field.errors %}            
