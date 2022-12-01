@@ -34,26 +34,21 @@ class PostsViewsTests(TestCase):
         cls.group = Group.objects.create(
             title='Тестовая группа',
             slug=SLUG1,
-            description='Тестовое описание',
-        )
+            description='Тестовое описание')
         cls.another_group = Group.objects.create(
             title='Дополнительная тестовая группа',
             slug=SLUG2,
-            description='Тестовое описание дополнительной группы',
-        )
+            description='Тестовое описание дополнительной группы')
         cls.post = Post.objects.create(
             text='Тестовый пост',
             author=cls.user1,
-            group=cls.group,
-        )
+            group=cls.group)
         cls.POST_DETAIL_URL = reverse(
             'posts:post_detail',
-            kwargs={'post_id': cls.post.pk}
-        )
+            kwargs={'post_id': cls.post.pk})
         cls.EDIT_PAGE_URL = reverse(
             'posts:post_edit',
-            kwargs={'post_id': cls.post.id}
-        )
+            kwargs={'post_id': cls.post.id})
 
     def setUp(self):
         self.guest_client = Client()
@@ -78,12 +73,12 @@ class PostsViewsTests(TestCase):
     def test_groups_page_show_correct_context(self):
         """Шаблон group_list.html сформирован с правильным контекстом."""
         response = self.authorized_client.get(GROUP_LIST_URL)
-        response_context_group = response.context['group']
-        self.assertEqual(response_context_group, self.group)
-        self.assertEqual(response_context_group.title, self.group.title)
-        self.assertEqual(response_context_group.slug, self.group.slug)
+        group = response.context['group']
+        self.assertEqual(group, self.group)
+        self.assertEqual(group.title, self.group.title)
+        self.assertEqual(group.slug, self.group.slug)
         self.assertEqual(
-            response_context_group.description,
+            group.description,
             self.group.description)
         self.assertEqual(len(response.context['page_obj']), 1)
         self.posts_check_all_fields(response.context['page_obj'][0])
