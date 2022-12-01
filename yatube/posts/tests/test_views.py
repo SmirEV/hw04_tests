@@ -29,30 +29,23 @@ class PostsViewsTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.user1 = User.objects.create_user(
-            username=USERNAME1
-        )
-        cls.user2 = User.objects.create_user(
-            username=USERNAME2
-        )
+        cls.user1 = User.objects.create_user(username=USERNAME1)
+        cls.user2 = User.objects.create_user(username=USERNAME2)
         cls.group = Group.objects.create(
             title='Тестовая группа',
             slug=SLUG1,
             description='Тестовое описание',
         )
-
         cls.another_group = Group.objects.create(
             title='Дополнительная тестовая группа',
             slug=SLUG2,
             description='Тестовое описание дополнительной группы',
         )
-
         cls.post = Post.objects.create(
             text='Тестовый пост',
             author=cls.user1,
             group=cls.group,
         )
-
         cls.POST_DETAIL_URL = reverse(
             'posts:post_detail',
             kwargs={'post_id': cls.post.pk}
@@ -79,18 +72,27 @@ class PostsViewsTests(TestCase):
     def test_index_page_show_correct_context(self):
         """Шаблон index.html сформирован с правильным контекстом."""
         response = self.authorized_client.get(INDEX_URL)
+        self.assertEqual(len(response.context['page_obj']), 1)
         self.posts_check_all_fields(response.context['page_obj'][0])
 
     def test_groups_page_show_correct_context(self):
         """Шаблон group_list.html сформирован с правильным контекстом."""
         response = self.authorized_client.get(GROUP_LIST_URL)
         self.assertEqual(response.context['group'], self.group)
+        self.assertEqual(response.context['group'].title, self.group.title)
+        self.assertEqual(response.context['group'].slug, self.group.slug)
+        self.assertEqual(
+            response.context['group'].description,
+            self.group.description
+        )
+        self.assertEqual(len(response.context['page_obj']), 1)
         self.posts_check_all_fields(response.context['page_obj'][0])
 
     def test_profile_page_show_correct_context(self):
         """Шаблон profile.html сформирован с правильным контекстом."""
         response = self.authorized_client.get(PROFILE1_URL)
         self.assertEqual(response.context['author'], self.user1)
+        self.assertEqual(len(response.context['page_obj']), 1)
         self.posts_check_all_fields(response.context['page_obj'][0])
 
     def test_posts_context_post_detail_template(self):
@@ -104,8 +106,7 @@ class PostsViewsTests(TestCase):
             self.post,
             self.authorized_client.get(
                 ANOTHER_GROUP_LIST_URL
-            ).context['page_obj']
-        )
+            ).context['page_obj'])
 
 
 class PostsPaginatorViewsTests(TestCase):
@@ -124,38 +125,20 @@ class PostsPaginatorViewsTests(TestCase):
             description='Тестовое описание',
         )
 
-        Post.objects.bulk_create(list(
+        Post.objects.bulk_create(
             Post(
                 text=f'Текст {i}',
                 author=cls.user,
                 group=cls.group
-            ) for i in range(cls.PAGE_COUNT)))
+            ) for i in range(cls.PAGE_COUNT))
 
         cls.cases = [
-            (
-                INDEX_URL,
-                MAX_POSTS_COUNT
-            ),
-            (
-                INDEX_URL + '?page=2',
-                cls.ADDITIONAL_POST_COUNT
-            ),
-            (
-                GROUP_LIST_URL,
-                MAX_POSTS_COUNT
-            ),
-            (
-                GROUP_LIST_URL + '?page=2',
-                cls.ADDITIONAL_POST_COUNT
-            ),
-            (
-                PROFILE1_URL,
-                MAX_POSTS_COUNT
-            ),
-            (
-                PROFILE1_URL + '?page=2',
-                cls.ADDITIONAL_POST_COUNT
-            ),
+            (INDEX_URL, MAX_POSTS_COUNT),
+            (INDEX_URL + '?page=2', cls.ADDITIONAL_POST_COUNT),
+            (GROUP_LIST_URL, MAX_POSTS_COUNT),
+            (GROUP_LIST_URL + '?page=2', cls.ADDITIONAL_POST_COUNT),
+            (PROFILE1_URL, MAX_POSTS_COUNT),
+            (PROFILE1_URL + '?page=2', cls.ADDITIONAL_POST_COUNT),
         ]
 
     def test_count_records_at_pages(self):
