@@ -3,12 +3,12 @@ from django.contrib.auth.decorators import login_required
 
 from .forms import PostForm
 from .models import Group, Post, User
-from posts.utils import paginator_max_posts_count
+from posts.utils import paginator
 
 
 def index(request):
     return render(request, 'posts/index.html', {
-        'page_obj': paginator_max_posts_count(request, Post.objects.all()),
+        'page_obj': paginator(request, Post.objects.all()),
     })
 
 
@@ -16,14 +16,14 @@ def group_posts(request, slug):
     group = get_object_or_404(Group, slug=slug)
     return render(request, 'posts/group_list.html', {
         'group': group,
-        'page_obj': paginator_max_posts_count(request, group.posts.all()),
+        'page_obj': paginator(request, group.posts.all()),
     })
 
 
 def profile(request, username):
     author = get_object_or_404(User, username=username)
     return render(request, 'posts/profile.html', {
-        'page_obj': paginator_max_posts_count(request, author.posts.all()),
+        'page_obj': paginator(request, author.posts.all()),
         'author': author,
     })
 
