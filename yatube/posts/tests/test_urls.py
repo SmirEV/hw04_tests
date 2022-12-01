@@ -7,7 +7,8 @@ from django.core.cache import cache
 from posts.models import Group, Post, User
 
 from ..constants import (INDEX_TEMPLATE, GROUP_LIST_TEMPLATE,
-                         PROFILE_TEMPLATE, CREATE_POST_TEMPLATE)
+                         PROFILE_TEMPLATE, CREATE_POST_TEMPLATE,
+                         POST_DETAIL_TEMPLATE, POST_EDIT_TEMPLATE)
 
 SLUG = 'slug'
 USERNAME = 'author'
@@ -16,6 +17,7 @@ INDEX_URL = reverse('posts:index')
 GROUP_LIST_URL = reverse('posts:group_list', kwargs={'slug': SLUG})
 PROFILE_URL = reverse('posts:profile', kwargs={'username': USERNAME})
 CREATE_POST_URL = reverse('posts:post_create')
+CREATE_REDIR_URL = LOGIN_URL + '?next=' + CREATE_POST_URL
 
 
 class PostsUrlsTests(TestCase):
@@ -41,6 +43,7 @@ class PostsUrlsTests(TestCase):
             'posts:post_edit',
             kwargs={'post_id': cls.post.id},
         )
+        cls.EDIT_REDIR_URL = LOGIN_URL + '?next=' + cls.POST_EDIT_URL
 
     def setUp(self):
         self.guest = Client()
@@ -56,49 +59,38 @@ class PostsUrlsTests(TestCase):
     def test_all_cases(self):
         """Проверка доступа страниц приложения post для разных юзеров."""
         cases = [
-            (INDEX_URL, self.guest),
-            (GROUP_LIST_URL, self.guest),
-            (PROFILE_URL, self.guest),
-            (self.POST_DETAIL_URL, self.guest),
-            (CREATE_POST_URL, self.author),
-            (self.POST_EDIT_URL, self.author)]
-        for url, client in cases:
+            (INDEX_URL, self.guest, HTTPStatus.OK),
+            (GROUP_LIST_URL, self.guest, HTTPStatus.OK),
+            (PROFILE_URL, self.guest, HTTPStatus.OK),
+            (self.POST_DETAIL_URL, self.guest, HTTPStatus.OK),
+            (CREATE_POST_URL, self.author, HTTPStatus.OK),
+            (self.POST_EDIT_URL, self.author, HTTPStatus.OK),
+            (CREATE_POST_URL, self.guest, HTTPStatus.FOUND),
+            (self.POST_EDIT_URL, self.guest, HTTPStatus.FOUND),
+            (self.POST_EDIT_URL, self.another, HTTPStatus.FOUND)]
+        for url, client, status in cases:
             with self.subTest(url=url, client=client):
-                self.assertEqual(client.get(url).status_code, HTTPStatus.OK)
+                self.assertEqual(client.get(url).status_code, status)
 
     def test_redirect_cases(self):
         """Проверка редиректа для неавториз и невавтора."""
         cases = [
-            (
-                CREATE_POST_URL,
-                self.guest,
-                LOGIN_URL + '?next=' + CREATE_POST_URL
-            ),
-            (
-                self.POST_EDIT_URL,
-                self.guest,
-                LOGIN_URL + '?next=' + self.POST_EDIT_URL
-            ),
-            (
-                self.POST_EDIT_URL,
-                self.another,
-                self.POST_DETAIL_URL
-            ),
-        ]
+            (CREATE_POST_URL, self.guest, CREATE_REDIR_URL),
+            (self.POST_EDIT_URL, self.guest, self.EDIT_REDIR_URL),
+            (self.POST_EDIT_URL, self.another, self.POST_DETAIL_URL)]
         for url, client, redirect in cases:
             with self.subTest(url=url, client=client, redirect=redirect):
-                self.assertEqual(client.get(url).status_code, HTTPStatus.FOUND)
                 self.assertRedirects(client.get(url), redirect)
 
     def test_urls_use_correct_template(self):
         """Проверка на то что URL-адрес использует подходящий шаблон."""
-        cases = {
-            (INDEX_TEMPLATE, reverse('posts:index')),
-            (GROUP_LIST_TEMPLATE, reverse(
-                'posts:group_list', kwargs={'slug': SLUG})),
-            (PROFILE_TEMPLATE, reverse(
-                'posts:profile', kwargs={'username': USERNAME})),
-            (CREATE_POST_TEMPLATE, reverse('posts:post_create'))}
+        cases = [
+            (INDEX_TEMPLATE, INDEX_URL),
+            (GROUP_LIST_TEMPLATE, GROUP_LIST_URL),
+            (PROFILE_TEMPLATE, PROFILE_URL),
+            (CREATE_POST_TEMPLATE, CREATE_POST_URL),
+            (POST_EDIT_TEMPLATE, self.POST_EDIT_URL),
+            (POST_DETAIL_TEMPLATE, self.POST_DETAIL_URL)]
 
         for template, url in cases:
             with self.subTest(url=url):
