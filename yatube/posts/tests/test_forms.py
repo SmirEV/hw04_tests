@@ -57,9 +57,12 @@ class PostsFormsTest(TestCase):
         self.assertRedirects(response, PROFILE_URL)
         posts_after = Post.objects.all()
         posts_after_count = len(posts_after)
+        new_posts_count = 0
         for post in posts_after:
             if not (post in posts_before):
                 new_post = post
+                new_posts_count += 1
+        self.assertEqual(new_posts_count, 1)
         self.assertEqual(posts_after_count, posts_before_count + 1)
         self.assertEqual(new_post.text, FORM_DATA['text'])
         self.assertEqual(new_post.author, self.author)
@@ -67,7 +70,6 @@ class PostsFormsTest(TestCase):
 
     def test_authorized_user_edit_post(self):
         """Проверка редактирования записи авторизированным клиентом."""
-        posts_before = Post.objects
         form_data = {
             'text': 'Отредактированный текст поста',
             'group': self.group2.id,
@@ -80,9 +82,7 @@ class PostsFormsTest(TestCase):
             response,
             self.POST_DETAIL_URL
         )
-        posts_after = Post.objects
-        edit_post = posts_after.get(pk=self.post.pk)
-        self.assertEqual(posts_after.count(), posts_before.count())
+        edit_post = Post.objects.get(pk=self.post.pk)
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
         self.assertEqual(edit_post.text, form_data['text'])
         self.assertEqual(edit_post.author, self.post.author)
@@ -93,15 +93,12 @@ class PostsFormsTest(TestCase):
         FORM_DATA = {
             'text': 'Тестовый пост формы',
             'group': self.group.id}
-        posts_before = Post.objects
-        posts_before_count = posts_before.count()
+        posts_before_count = Post.objects.count()
         response = self.guest_client.post(
             POST_CREATE_URL,
             data=FORM_DATA)
-        posts_after = Post.objects
         posts_after_count = Post.objects.count()
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
         redirect = LOGIN_URL + '?next=' + POST_CREATE_URL
         self.assertRedirects(response, redirect)
         self.assertEqual(posts_after_count, posts_before_count)
-        self.assertEqual(posts_before, posts_after)
