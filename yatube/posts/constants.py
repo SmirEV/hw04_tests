@@ -1,7 +1,6 @@
 # максимальное количество постов на странице
 MAX_POSTS_COUNT = 10
 
-LOGIN_TEMPLATE = 'users/login.html'
 INDEX_TEMPLATE = 'posts/index.html'
 GROUP_LIST_TEMPLATE = 'posts/group_list.html'
 PROFILE_TEMPLATE = 'posts/profile.html'
