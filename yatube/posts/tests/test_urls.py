@@ -68,7 +68,7 @@ class PostsUrlsTests(TestCase):
             (self.POST_EDIT_URL, self.another, 302)]
         for url, client, status in cases:
             with self.subTest(url=url, client=client):
-                self.assertEqual(client.get(url).getStatusCode(), status)
+                self.assertEqual(client.get(url).status_code, status)
 
     def test_redirect_cases(self):
         """Проверка редиректа для неавториз и невавтора."""
