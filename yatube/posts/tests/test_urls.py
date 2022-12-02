@@ -1,5 +1,3 @@
-from http import HTTPStatus
-
 from django.core.cache import cache
 from django.test import Client, TestCase
 from django.urls import reverse
@@ -56,20 +54,20 @@ class PostsUrlsTests(TestCase):
 
         cache.clear()
 
-    def test_all_cases(self): 
-        """Проверка доступа страниц приложения post для разных юзеров.""" 
-        cases = [ 
-            (INDEX_URL, self.guest, 200), 
-            (GROUP_LIST_URL, self.guest, 200), 
-            (PROFILE_URL, self.guest, 200), 
-            (self.POST_DETAIL_URL, self.guest, 200), 
-            (CREATE_POST_URL, self.author, 200), 
-            (self.POST_EDIT_URL, self.author, 200), 
-            (CREATE_POST_URL, self.guest, 302), 
-            (self.POST_EDIT_URL, self.guest, 302), 
-            (self.POST_EDIT_URL, self.another, 302)] 
-        for url, client, status in cases: 
-            with self.subTest(url=url, client=client): 
+    def test_all_cases(self):
+        """Проверка доступа страниц приложения post для разных юзеров."""
+        cases = [
+            (INDEX_URL, self.guest, 200),
+            (GROUP_LIST_URL, self.guest, 200),
+            (PROFILE_URL, self.guest, 200),
+            (self.POST_DETAIL_URL, self.guest, 200),
+            (CREATE_POST_URL, self.author, 200),
+            (self.POST_EDIT_URL, self.author, 200),
+            (CREATE_POST_URL, self.guest, 302),
+            (self.POST_EDIT_URL, self.guest, 302),
+            (self.POST_EDIT_URL, self.another, 302)]
+        for url, client, status in cases:
+            with self.subTest(url=url, client=client):
                 self.assertEqual(client.get(url).getStatusCode(), status)
 
     def test_redirect_cases(self):
