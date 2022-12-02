@@ -87,11 +87,11 @@ class PostsFormsTest(TestCase):
         FORM_DATA = {
             'text': 'Тестовый пост формы',
             'group': self.group.id}
-        posts_before = Post.objects.all()
+        posts_before = set(Post.objects.all())
         response = self.guest_client.post(
             POST_CREATE_URL,
             data=FORM_DATA)
-        posts_after = Post.objects.all()
+        posts_after = set(Post.objects.all())
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
         redirect = LOGIN_URL + '?next=' + POST_CREATE_URL
         self.assertRedirects(response, redirect)
