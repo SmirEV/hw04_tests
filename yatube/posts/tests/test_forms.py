@@ -46,27 +46,21 @@ class PostsFormsTest(TestCase):
 
     def test_posts_forms_create_post(self):
         """Проверка, создает ли форма пост в базе."""
+        posts = set(Post.objects.all())
         FORM_DATA = {
             'text': 'Тестовый пост формы',
             'group': self.group.id}
-        posts_before = Post.objects.all()
-        posts_before_count = len(posts_before)
+        posts = set(Post.objects.all())
         response = self.authorized_client.post(
             POST_CREATE_URL,
             data=FORM_DATA)
         self.assertRedirects(response, PROFILE_URL)
-        posts_after = Post.objects.all()
-        posts_after_count = len(posts_after)
-        new_posts_count = 0
-        for post in posts_after:
-            if not (post in posts_before):
-                new_post = post
-                new_posts_count += 1
-        self.assertEqual(new_posts_count, 1)
-        self.assertEqual(posts_after_count, posts_before_count + 1)
-        self.assertEqual(new_post.text, FORM_DATA['text'])
-        self.assertEqual(new_post.author, self.author)
-        self.assertEqual(new_post.group_id, FORM_DATA['group'])
+        posts = set(Post.objects.all()) - posts
+        self.assertEqual(len(posts), 1)
+        post = posts.pop()
+        self.assertEqual(post.text, FORM_DATA['text'])
+        self.assertEqual(post.author, self.author)
+        self.assertEqual(post.group_id, FORM_DATA['group'])
 
     def test_authorized_user_edit_post(self):
         """Проверка редактирования записи авторизированным клиентом."""
@@ -82,23 +76,23 @@ class PostsFormsTest(TestCase):
             response,
             self.POST_DETAIL_URL
         )
-        edit_post = Post.objects.get(pk=self.post.pk)
+        post = Post.objects.get(pk=self.post.pk)
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
-        self.assertEqual(edit_post.text, form_data['text'])
-        self.assertEqual(edit_post.author, self.post.author)
-        self.assertEqual(edit_post.group_id, form_data['group'])
+        self.assertEqual(post.text, form_data['text'])
+        self.assertEqual(post.author, self.post.author)
+        self.assertEqual(post.group_id, form_data['group'])
 
-    def test_nonauthorized_user_create_post(self):
-        """Проверка создания записи не авторизированным пользователем."""
-        FORM_DATA = {
-            'text': 'Тестовый пост формы',
-            'group': self.group.id}
-        posts_before_count = Post.objects.count()
-        response = self.guest_client.post(
-            POST_CREATE_URL,
-            data=FORM_DATA)
-        posts_after_count = Post.objects.count()
-        self.assertEqual(response.status_code, HTTPStatus.FOUND)
-        redirect = LOGIN_URL + '?next=' + POST_CREATE_URL
-        self.assertRedirects(response, redirect)
-        self.assertEqual(posts_after_count, posts_before_count)
+    def test_nonauthorized_user_create_post(self): 
+        """Проверка создания записи не авторизированным пользователем.""" 
+        FORM_DATA = { 
+            'text': 'Тестовый пост формы', 
+            'group': self.group.id} 
+        posts_before = Post.objects.all() 
+        response = self.guest_client.post( 
+            POST_CREATE_URL, 
+            data=FORM_DATA) 
+        posts_after = Post.objects.all()
+        self.assertEqual(response.status_code, HTTPStatus.FOUND) 
+        redirect = LOGIN_URL + '?next=' + POST_CREATE_URL 
+        self.assertRedirects(response, redirect) 
+        self.assertEqual(posts_before, posts_after) 
